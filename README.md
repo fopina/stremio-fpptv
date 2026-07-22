@@ -19,6 +19,12 @@ Then open:
 http://localhost:7000/
 ```
 
+If you change `PORT`, also set `ADDON_BASE_URL` to the URL Stremio will use to
+reach this addon. For local testing it must include the same local port, such as
+`ADDON_BASE_URL=http://localhost:7001` when `PORT=7001`. When testing through a
+reverse tunnel, set it to the tunnel domain, such as
+`ADDON_BASE_URL=https://example.trycloudflare.com`.
+
 Stremio addon endpoints:
 
 ```text

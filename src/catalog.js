@@ -2,6 +2,7 @@ const BASE_URL = process.env.ADDON_BASE_URL || "http://localhost:7000";
 const STREAM_URL = process.env.FPP_TV_STREAM_URL || "";
 const FPP_TV_URL = "https://tv.fpp.pt/";
 const FPP_TV_CACHE_TTL_MS = 5 * 60 * 1000;
+const FPP_TV_FETCH_TIMEOUT_MS = 10 * 1000;
 
 let scrapedStreamCache = {
   fetchedAt: 0,
@@ -86,11 +87,12 @@ function extractLatestStreamFromHtml(html) {
 
 async function scrapeLatestStream() {
   const now = Date.now();
-  if (scrapedStreamCache.stream && now - scrapedStreamCache.fetchedAt < FPP_TV_CACHE_TTL_MS) {
+  if (scrapedStreamCache.fetchedAt && now - scrapedStreamCache.fetchedAt < FPP_TV_CACHE_TTL_MS) {
     return scrapedStreamCache.stream;
   }
 
   const response = await fetch(FPP_TV_URL, {
+    signal: AbortSignal.timeout(FPP_TV_FETCH_TIMEOUT_MS),
     headers: {
       accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       "accept-language": "pt-PT,pt;q=0.9,en;q=0.8",
@@ -100,6 +102,13 @@ async function scrapeLatestStream() {
   });
 
   if (!response.ok) {
+    if (response.status === 404 || response.status === 410) {
+      scrapedStreamCache = {
+        fetchedAt: now,
+        stream: null
+      };
+    }
+
     return null;
   }
 
