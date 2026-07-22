@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FPP TV Stremio Addon</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #f7f7f4;
+        color: #1c1d20;
+      }
+
+      main {
+        box-sizing: border-box;
+        width: min(960px, 100%);
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      header {
+        margin-bottom: 32px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(2rem, 5vw, 4rem);
+        line-height: 1;
+      }
+
+      p {
+        max-width: 680px;
+        margin: 0;
+        color: #56585e;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin: 28px 0;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .endpoint {
+        display: block;
+        min-height: 96px;
+        padding: 18px;
+        border: 1px solid #d9d9d1;
+        border-radius: 8px;
+        background: #ffffff;
+        text-decoration: none;
+      }
+
+      .endpoint strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .endpoint code {
+        overflow-wrap: anywhere;
+        color: #315a8a;
+      }
+
+      pre {
+        overflow: auto;
+        padding: 18px;
+        border: 1px solid #d9d9d1;
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #161718;
+          color: #f2f2ef;
+        }
+
+        p {
+          color: #b6b8bd;
+        }
+
+        .endpoint,
+        pre {
+          border-color: #37393f;
+          background: #202226;
+        }
+
+        .endpoint code {
+          color: #9fc7ff;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>FPP TV</h1>
+        <p>Local Stremio catalog and stream addon boilerplate for tv.fpp.pt.</p>
+      </header>
+
+      <section class="grid" aria-label="Addon endpoints">
+        <a class="endpoint" href="/manifest.json">
+          <strong>Manifest</strong>
+          <code>/manifest.json</code>
+        </a>
+        <a class="endpoint" href="/catalog/tv/fpp-live.json">
+          <strong>Catalog</strong>
+          <code>/catalog/tv/fpp-live.json</code>
+        </a>
+        <a class="endpoint" href="/stream/tv/fpptv:live.json">
+          <strong>Stream</strong>
+          <code>/stream/tv/fpptv:live.json</code>
+        </a>
+      </section>
+
+      <pre id="preview">Loading manifest...</pre>
+    </main>
+
+    <script>
+      const preview = document.querySelector("#preview");
+
+      fetch("/manifest.json")
+        .then((response) => response.json())
+        .then((manifest) => {
+          preview.textContent = JSON.stringify(manifest, null, 2);
+        })
+        .catch((error) => {
+          preview.textContent = error.message;
+        });
+    </script>
+  </body>
+</html>
