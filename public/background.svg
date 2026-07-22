@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title">
+  <title id="title">FPP TV background</title>
+  <rect width="1280" height="720" fill="#162032"/>
+  <path d="M0 520h1280v200H0z" fill="#f7f7f4"/>
+  <path d="M124 126h520v102H242v110h342v102H242v216H124V126Z" fill="#ffffff"/>
+  <path d="M720 126h122v530H720V126Z" fill="#f0c24b"/>
+  <path d="M124 64h718v44H124V64Z" fill="#5aa7a7"/>
+</svg>

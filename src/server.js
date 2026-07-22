@@ -1,0 +1,99 @@
+import { createServer } from "node:http";
+import { readFile } from "node:fs/promises";
+import { extname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { ADDON_PORT, getCatalog, getStreams, manifest } from "./catalog.js";
+
+const rootDir = join(fileURLToPath(new URL(".", import.meta.url)), "..");
+const publicDir = join(rootDir, "public");
+
+const contentTypes = {
+  ".html": "text/html; charset=utf-8",
+  ".svg": "image/svg+xml; charset=utf-8"
+};
+
+const corsHeaders = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, OPTIONS",
+  "access-control-allow-headers": "*"
+};
+
+function sendJson(response, statusCode, body) {
+  response.writeHead(statusCode, {
+    ...corsHeaders,
+    "content-type": "application/json; charset=utf-8"
+  });
+  response.end(JSON.stringify(body, null, 2));
+}
+
+function sendText(response, statusCode, contentType, body) {
+  response.writeHead(statusCode, {
+    ...corsHeaders,
+    "content-type": contentType
+  });
+  response.end(body);
+}
+
+async function sendPublicFile(response, pathname) {
+  const fileName = pathname === "/" ? "index.html" : pathname.slice(1);
+  const filePath = join(publicDir, fileName);
+  const contentType = contentTypes[extname(filePath)] || "text/plain; charset=utf-8";
+
+  try {
+    const body = await readFile(filePath, "utf8");
+    sendText(response, 200, contentType, body);
+  } catch {
+    sendJson(response, 404, { error: "Not found" });
+  }
+}
+
+function decodePathSegment(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+async function handleAddonRoute(request, response, pathname) {
+  if (request.method === "OPTIONS") {
+    sendText(response, 204, "text/plain; charset=utf-8", "");
+    return true;
+  }
+
+  if (pathname === "/manifest.json") {
+    sendJson(response, 200, manifest);
+    return true;
+  }
+
+  const catalogMatch = pathname.match(/^\/catalog\/([^/]+)\/([^/.]+)\.json$/);
+  if (catalogMatch) {
+    const [, type, id] = catalogMatch;
+    sendJson(response, 200, getCatalog(decodePathSegment(type), decodePathSegment(id)));
+    return true;
+  }
+
+  const streamMatch = pathname.match(/^\/stream\/([^/]+)\/([^/.]+)\.json$/);
+  if (streamMatch) {
+    const [, type, id] = streamMatch;
+    sendJson(response, 200, await getStreams(decodePathSegment(type), decodePathSegment(id)));
+    return true;
+  }
+
+  return false;
+}
+
+const server = createServer(async (request, response) => {
+  const url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
+
+  if (await handleAddonRoute(request, response, url.pathname)) {
+    return;
+  }
+
+  await sendPublicFile(response, url.pathname);
+});
+
+server.listen(ADDON_PORT, "0.0.0.0", () => {
+  console.log(`FPP TV Stremio addon listening on http://localhost:${ADDON_PORT}`);
+});

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-labelledby="title">
+  <title id="title">FPP TV poster</title>
+  <rect width="600" height="900" fill="#162032"/>
+  <rect x="56" y="56" width="488" height="788" rx="28" fill="#f7f7f4"/>
+  <path d="M128 180h250v72H212v80h142v72H212v188h-84V180Z" fill="#162032"/>
+  <path d="M396 180h76v412h-76V180Z" fill="#d6a92c"/>
+  <path d="M128 662h344v42H128v-42Z" fill="#5aa7a7"/>
+  <text x="128" y="776" fill="#162032" font-family="Arial, sans-serif" font-size="54" font-weight="700">FPP TV</text>
+</svg>

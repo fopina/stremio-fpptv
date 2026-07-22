@@ -1,0 +1,32 @@
+{
+  "name": "stremio-fpptv",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "remoteUser": "node",
+  "containerEnv": {
+    "NPM_CONFIG_CACHE": "/workspace/.cache/npm",
+    "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.cache/ms-playwright"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [
+    7000
+  ],
+  "portsAttributes": {
+    "7000": {
+      "label": "Stremio addon",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "mkdir -p /workspace/.cache/npm /workspace/.cache/ms-playwright"
+}

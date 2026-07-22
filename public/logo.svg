@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">FPP TV logo</title>
+  <rect width="512" height="512" rx="64" fill="#162032"/>
+  <path d="M122 154h190v54H185v58h108v54H185v116h-63V154Z" fill="#ffffff"/>
+  <path d="M326 154h64v282h-64V154Z" fill="#f0c24b"/>
+  <path d="M122 94h268v32H122V94Z" fill="#5aa7a7"/>
+</svg>
