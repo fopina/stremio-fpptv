@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ADDON_PORT, getCatalog, getStreams, manifest } from "./catalog.js";
+import { ADDON_PORT, getCatalog, getMeta, getPosterSvg, getStreams, manifest } from "./catalog.js";
 
 const rootDir = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const publicDir = join(rootDir, "public");
@@ -20,8 +20,10 @@ const corsHeaders = {
 };
 
 function sendJson(response, statusCode, body) {
+  const cacheMaxAge = Number.isInteger(body.cacheMaxAge) ? body.cacheMaxAge : null;
   response.writeHead(statusCode, {
     ...corsHeaders,
+    ...(cacheMaxAge !== null ? { "cache-control": `public, max-age=${cacheMaxAge}` } : {}),
     "content-type": "application/json; charset=utf-8"
   });
   response.end(JSON.stringify(body, null, 2));
@@ -30,6 +32,15 @@ function sendJson(response, statusCode, body) {
 function sendText(response, statusCode, contentType, body) {
   response.writeHead(statusCode, {
     ...corsHeaders,
+    "content-type": contentType
+  });
+  response.end(body);
+}
+
+function sendCacheableText(response, statusCode, contentType, body, cacheMaxAge) {
+  response.writeHead(statusCode, {
+    ...corsHeaders,
+    "cache-control": `public, max-age=${cacheMaxAge}`,
     "content-type": contentType
   });
   response.end(body);
@@ -56,6 +67,10 @@ function decodePathSegment(value) {
   }
 }
 
+function parseExtraProps(value) {
+  return Object.fromEntries(new URLSearchParams(value || "").entries());
+}
+
 async function handleAddonRoute(request, response, pathname) {
   if (request.method === "OPTIONS") {
     sendText(response, 204, "text/plain; charset=utf-8", "");
@@ -67,10 +82,36 @@ async function handleAddonRoute(request, response, pathname) {
     return true;
   }
 
-  const catalogMatch = pathname.match(/^\/catalog\/([^/]+)\/([^/.]+)\.json$/);
+  const posterMatch = pathname.match(/^\/poster\/(.+)\.svg$/);
+  if (posterMatch) {
+    const svg = await getPosterSvg(decodePathSegment(posterMatch[1]));
+    if (svg) {
+      sendCacheableText(response, 200, "image/svg+xml; charset=utf-8", svg, 60);
+    } else {
+      sendJson(response, 404, { error: "Poster not found" });
+    }
+    return true;
+  }
+
+  const catalogMatch = pathname.match(/^\/catalog\/([^/]+)\/([^/]+)(?:\/(.+))?\.json$/);
   if (catalogMatch) {
-    const [, type, id] = catalogMatch;
-    sendJson(response, 200, getCatalog(decodePathSegment(type), decodePathSegment(id)));
+    const [, type, id, extraProps] = catalogMatch;
+    sendJson(
+      response,
+      200,
+      await getCatalog(
+        decodePathSegment(type),
+        decodePathSegment(id),
+        parseExtraProps(extraProps)
+      )
+    );
+    return true;
+  }
+
+  const metaMatch = pathname.match(/^\/meta\/([^/]+)\/([^/.]+)\.json$/);
+  if (metaMatch) {
+    const [, type, id] = metaMatch;
+    sendJson(response, 200, await getMeta(decodePathSegment(type), decodePathSegment(id)));
     return true;
   }
 
