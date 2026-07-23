@@ -2,6 +2,11 @@
   "env": {
     "ADDON_BASE_URL": "https://463c13ea8b1b-stremio-fpptv.baby-beamup.club"
   },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
   "healthchecks": {
     "web": [
       {
