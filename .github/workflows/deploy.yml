@@ -23,6 +23,6 @@ jobs:
         uses: Stremio/beamup-deploy-action@v1.0.1
         with:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          beamup_host: ${{ secrets.BEAMUP_HOST }}
-          username_github: ${{ secrets.USERNAME_GITHUB }}
+          beamup_host: a.baby-beamup.club
+          username_github: fopina-beamup
           project_name: stremio-fpptv
