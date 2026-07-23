@@ -50,7 +50,8 @@ Deployments use the `beamup-cli` tool.
 
 The GitHub Actions deployment workflow requires these repository secrets:
 
-- `SSH_PRIVATE_KEY`: private SSH key used by Beamup for deployment
+- `SSH_PRIVATE_KEY`: private SSH key used by Beamup for deployment, pasted
+  exactly as the key file contents, without base64 or any other encoding
 - `BEAMUP_HOST`: Beamup SSH host
 - `USERNAME_GITHUB`: GitHub username used by Beamup
 
