@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy
-        uses: Stremio/beamup-deploy-action@v1.0.1
+        uses: Stremio/beamup-deploy-action@76fe4d33120685ad4decc61ae8480fa7dbeb0a60 # v1.0.1
         with:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           beamup_host: a.baby-beamup.club
