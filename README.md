@@ -48,6 +48,12 @@ cloudflared tunnel --url localhost:7000
 
 Deployments use the `beamup-cli` tool.
 
+The GitHub Actions deployment workflow requires these repository secrets:
+
+- `SSH_PRIVATE_KEY`: private SSH key used by Beamup for deployment
+- `BEAMUP_HOST`: Beamup SSH host
+- `USERNAME_GITHUB`: GitHub username used by Beamup
+
 For GitHub Actions or other CI workflows, prefer creating a separate SSH key,
 adding it to the GitHub account only long enough for a single `beamup-cli`
 deployment, and then removing it from GitHub. Beamup caches the key after the
