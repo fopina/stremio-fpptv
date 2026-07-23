@@ -13,73 +13,119 @@
         line-height: 1.5;
       }
 
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
         min-height: 100vh;
-        background: #f7f7f4;
+        background: #f6f7f4;
         color: #1c1d20;
       }
 
       main {
-        box-sizing: border-box;
-        width: min(960px, 100%);
+        width: min(760px, 100%);
         margin: 0 auto;
-        padding: 40px 20px;
+        padding: 56px 20px;
       }
 
       header {
-        margin-bottom: 32px;
+        margin-bottom: 28px;
       }
 
       h1 {
-        margin: 0 0 8px;
-        font-size: clamp(2rem, 5vw, 4rem);
-        line-height: 1;
+        margin: 0 0 10px;
+        font-size: clamp(2.25rem, 8vw, 4.5rem);
+        line-height: 0.95;
       }
 
       p {
-        max-width: 680px;
+        max-width: 640px;
         margin: 0;
         color: #56585e;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-        margin: 28px 0;
+        font-size: 1rem;
       }
 
       a {
         color: inherit;
       }
 
-      .endpoint {
-        display: block;
-        min-height: 96px;
-        padding: 18px;
-        border: 1px solid #d9d9d1;
+      .details {
+        display: grid;
+        gap: 14px;
+        margin: 30px 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .details li {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        align-items: baseline;
+        color: #56585e;
+      }
+
+      .details strong {
+        min-width: 86px;
+        color: #1c1d20;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 32px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 48px;
+        padding: 0 10px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #1c1d20;
         border-radius: 8px;
-        background: #ffffff;
+        background: #1c1d20;
+        color: #ffffff;
+        font: inherit;
+        font-weight: 700;
+        text-align: center;
         text-decoration: none;
+        cursor: pointer;
+        transition:
+          background-color 160ms ease,
+          border-color 160ms ease,
+          color 160ms ease,
+          transform 160ms ease;
       }
 
-      .endpoint strong {
-        display: block;
-        margin-bottom: 8px;
+      .button:hover {
+        transform: translateY(-1px);
       }
 
-      .endpoint code {
-        overflow-wrap: anywhere;
-        color: #315a8a;
-      }
-
-      pre {
-        overflow: auto;
-        padding: 18px;
-        border: 1px solid #d9d9d1;
-        border-radius: 8px;
+      .button.secondary {
         background: #ffffff;
+        color: #1c1d20;
+      }
+
+      .button:focus-visible {
+        outline: 3px solid #5b8fd9;
+        outline-offset: 3px;
+      }
+
+      .status {
+        min-height: 24px;
+        margin-top: 14px;
+        color: #315a8a;
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 560px) {
+        main {
+          padding-top: 40px;
+        }
       }
 
       @media (prefers-color-scheme: dark) {
@@ -88,17 +134,27 @@
           color: #f2f2ef;
         }
 
-        p {
+        p,
+        .details li {
           color: #b6b8bd;
         }
 
-        .endpoint,
-        pre {
-          border-color: #37393f;
-          background: #202226;
+        .details strong {
+          color: #f2f2ef;
         }
 
-        .endpoint code {
+        .button {
+          border-color: #f2f2ef;
+          background: #f2f2ef;
+          color: #161718;
+        }
+
+        .button.secondary {
+          background: transparent;
+          color: #f2f2ef;
+        }
+
+        .status {
           color: #9fc7ff;
         }
       }
@@ -108,38 +164,63 @@
     <main>
       <header>
         <h1>FPP TV</h1>
-        <p>Local Stremio catalog and stream addon boilerplate for tv.fpp.pt.</p>
+        <p>
+          A Stremio catalog and stream addon for videos published by the Portuguese
+          Skating Federation at <a href="https://tv.fpp.pt/">tv.fpp.pt</a>.
+        </p>
       </header>
 
-      <section class="grid" aria-label="Addon endpoints">
-        <a class="endpoint" href="/manifest.json">
-          <strong>Manifest</strong>
-          <code>/manifest.json</code>
-        </a>
-        <a class="endpoint" href="/catalog/tv/fpp-live.json">
+      <ul class="details" aria-label="Addon details">
+        <li>
+          <strong>Provides</strong>
+          <span>Channel catalog, metadata, and streams for recent FPP TV videos.</span>
+        </li>
+        <li>
           <strong>Catalog</strong>
-          <code>/catalog/tv/fpp-live.json</code>
-        </a>
-        <a class="endpoint" href="/stream/tv/fpptv:live.json">
-          <strong>Stream</strong>
-          <code>/stream/tv/fpptv:live.json</code>
-        </a>
-      </section>
+          <span>FPP TV sports and roller hockey competitions.</span>
+        </li>
+        <li>
+          <strong>Source</strong>
+          <a href="https://tv.fpp.pt/">tv.fpp.pt</a>
+        </li>
+        <li>
+          <strong>GitHub</strong>
+          <a href="https://github.com/fopina/stremio-fpptv">fopina/stremio-fpptv</a>
+        </li>
+      </ul>
 
-      <pre id="preview">Loading manifest...</pre>
+      <div class="actions" aria-label="Install actions">
+        <a class="button" id="install" href="/manifest.json">Install</a>
+        <a class="button secondary" id="install-web" href="/manifest.json">Install Web</a>
+        <button class="button secondary" id="copy-url" type="button">Copy URL</button>
+      </div>
+
+      <p class="status" id="status" aria-live="polite"></p>
     </main>
 
     <script>
-      const preview = document.querySelector("#preview");
+      const manifestUrl = new URL("/manifest.json", window.location.href).href;
+      const installUrl = manifestUrl.replace(/^https?:\/\//, "stremio://");
+      const webInstallUrl = `https://app.strem.io/shell-v4.4/#/addons/community/all?addon=${encodeURIComponent(
+        manifestUrl
+      )}`;
 
-      fetch("/manifest.json")
-        .then((response) => response.json())
-        .then((manifest) => {
-          preview.textContent = JSON.stringify(manifest, null, 2);
-        })
-        .catch((error) => {
-          preview.textContent = error.message;
-        });
+      const installLink = document.querySelector("#install");
+      const installWebLink = document.querySelector("#install-web");
+      const copyButton = document.querySelector("#copy-url");
+      const status = document.querySelector("#status");
+
+      installLink.href = installUrl;
+      installWebLink.href = webInstallUrl;
+
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(manifestUrl);
+          status.textContent = "Manifest URL copied.";
+        } catch {
+          status.textContent = manifestUrl;
+        }
+      });
     </script>
   </body>
 </html>

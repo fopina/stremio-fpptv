@@ -29,15 +29,16 @@ Stremio addon endpoints:
 
 ```text
 http://localhost:7000/manifest.json
-http://localhost:7000/catalog/tv/fpp-live.json
-http://localhost:7000/stream/tv/fpptv:live.json
+http://localhost:7000/catalog/channel/fpp-tv.json
+http://localhost:7000/catalog/channel/fpp-tv/genre=Hoquei%20em%20Patins.json
+http://localhost:7000/stream/channel/fpptv:event:recent:e-1234.json
 ```
 
-To force a direct playable stream while developing, set `FPP_TV_STREAM_URL`
-inside the devcontainer before starting the server. Without that variable, the
-stream endpoint scrapes the latest direct `tv.fpp.pt` media URL from the FPP TV
-homepage. If scraping fails or no media URL is available, it falls back to an
-external link to `https://tv.fpp.pt/`.
+The addon exposes one `channel` catalog named `FPP TV`. Without a genre, it
+returns individual video metas from the recent videos page. Genre filters return
+video metas from the selected sport or hockey championship. Selecting any meta
+returns that video's single stream. Scraped video lists are cached for 60
+seconds.
 
 To test in stremio web, use ngrok or cloudflare tunnels to avoid browser blocking local requests:
 ```
