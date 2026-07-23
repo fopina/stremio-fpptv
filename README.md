@@ -43,3 +43,14 @@ To test in stremio web, use ngrok or cloudflare tunnels to avoid browser blockin
 ```
 cloudflared tunnel --url localhost:7000
 ```
+
+## Deployment
+
+Deployments use the `beamup-cli` tool.
+
+For GitHub Actions or other CI workflows, prefer creating a separate SSH key,
+adding it to the GitHub account only long enough for a single `beamup-cli`
+deployment, and then removing it from GitHub. Beamup caches the key after the
+first successful deployment, so future workflow runs do not need GitHub account
+access. This limits the impact of a compromised workflow to Beamup access
+instead of exposing the GitHub account.
