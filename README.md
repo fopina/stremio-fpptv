@@ -43,3 +43,20 @@ To test in stremio web, use ngrok or cloudflare tunnels to avoid browser blockin
 ```
 cloudflared tunnel --url localhost:7000
 ```
+
+## Deployment
+
+Deployments are handled by the GitHub Actions workflow using
+[`Stremio/beamup-deploy-action`](https://github.com/Stremio/beamup-deploy-action).
+
+The GitHub Actions deployment workflow uses one repository secret:
+
+- `SSH_PRIVATE_KEY`: private SSH key used by Beamup for deployment, pasted
+  exactly as the key file contents, without base64 or any other encoding
+
+For GitHub Actions or other CI workflows, prefer creating a separate SSH key,
+adding it to the GitHub account only long enough for the first successful
+deployment, and then removing it from GitHub. Beamup caches the key after that,
+so future workflow runs do not need GitHub account access. This limits the
+impact of a compromised workflow to Beamup access instead of exposing the GitHub
+account.
