@@ -1,3 +1,7 @@
+import { createRequire } from "node:module";
+
+const { version } = createRequire(import.meta.url)("../package.json");
+
 const BASE_URL = process.env.ADDON_BASE_URL || "http://localhost:7000";
 const FPP_TV_URL = "https://tv.fpp.pt/";
 const ENETRES_PLAYER_URL = "https://players.cdn.enetres.net/";
@@ -109,7 +113,7 @@ export const ADDON_PORT = Number.parseInt(process.env.PORT || "7000", 10);
 
 export const manifest = {
   id: "com.skmobi.fpptv",
-  version: "0.1.1",
+  version,
   name: "FPP TV",
   description: "Catalog and stream addon for tv.fpp.pt.",
   logo: `${BASE_URL}/logo.svg`,
