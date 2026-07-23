@@ -26,4 +26,4 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           beamup_host: a.baby-beamup.club
           username_github: fopina-beamup
-          project_name: stremio-fpptv
+          project_name: fpptv
