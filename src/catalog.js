@@ -98,7 +98,7 @@ export const ADDON_PORT = Number.parseInt(process.env.PORT || "7000", 10);
 
 export const manifest = {
   id: "pt.fpp.tv",
-  version: "0.1.0",
+  version: "0.1.1",
   name: "FPP TV",
   description: "Catalog and stream addon for tv.fpp.pt.",
   logo: `${BASE_URL}/logo.svg`,
