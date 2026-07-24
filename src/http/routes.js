@@ -6,7 +6,7 @@ import { sendPublicFile } from "./static.js";
 const defaultAddon = { getCatalog, getMeta, getPosterSvg, getStreams };
 
 export async function handleRequest(request, response, { addon = defaultAddon } = {}) {
-  const url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
+  const url = new URL(request.url || "/", "http://localhost");
 
   if (request.method === "OPTIONS") {
     sendResponse(response, 204);

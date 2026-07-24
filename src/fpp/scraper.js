@@ -4,12 +4,17 @@ import { SOURCE_BY_KEY } from "../sources.js";
 import { fetchHtml, fetchJson } from "./client.js";
 import { parseEventsFromHtml } from "./parser.js";
 
+const DEFAULT_MAX_CACHE_ENTRIES = 500;
+
 export function createFppScraper({
   fetchHtmlImpl = fetchHtml,
   fetchJsonImpl = fetchJson,
   now = () => Date.now(),
-  ttlMs = FPP_TV_VIDEO_LIST_CACHE_TTL_MS
+  ttlMs = FPP_TV_VIDEO_LIST_CACHE_TTL_MS,
+  maxCacheEntries = DEFAULT_MAX_CACHE_ENTRIES,
+  logger = console
 } = {}) {
+  const cacheLimit = Math.max(0, maxCacheEntries);
   const catalogPageCache = new Map();
   const eventCache = new Map();
   const liveStreamCache = new Map();
@@ -32,15 +37,30 @@ export function createFppScraper({
     }
 
     const request = (async () => {
-      const events = parseEventsFromHtml(await fetchHtmlImpl(url), source);
-      const fetchedAt = now();
-      catalogPageCache.set(cacheKey, { fetchedAt, events });
+      try {
+        const events = parseEventsFromHtml(await fetchHtmlImpl(url), source);
+        const fetchedAt = now();
+        setCacheEntry(catalogPageCache, cacheKey, { fetchedAt, events }, cacheLimit);
 
-      for (const event of events) {
-        eventCache.set(event.id, { fetchedAt, event });
+        for (const event of events) {
+          setCacheEntry(eventCache, event.id, { fetchedAt, event }, cacheLimit);
+        }
+
+        return events;
+      } catch (error) {
+        logScrapeFailure(logger, {
+          action: "scrapeSourceEvents",
+          sourceKey: source.key,
+          url,
+          error
+        });
+
+        if (cached) {
+          return cached.events;
+        }
+
+        throw error;
       }
-
-      return events;
     })();
 
     inFlightSourceFetches.set(cacheKey, request);
@@ -64,7 +84,7 @@ export function createFppScraper({
       return null;
     }
 
-    const events = await scrapeSourceEvents(source).catch(() => []);
+    const events = await scrapeSourceEvents(source);
     return events.find((event) => event.id === id) || null;
   }
 
@@ -81,11 +101,27 @@ export function createFppScraper({
     }
 
     const request = (async () => {
-      const data = await fetchJsonImpl(getLiveDataUrl(liveId), {
-        referer: getLivePlayerUrl(liveId)
-      });
-      liveStreamCache.set(liveId, { fetchedAt: now(), data });
-      return data;
+      const url = getLiveDataUrl(liveId);
+      try {
+        const data = await fetchJsonImpl(url, {
+          referer: getLivePlayerUrl(liveId)
+        });
+        setCacheEntry(liveStreamCache, liveId, { fetchedAt: now(), data }, cacheLimit);
+        return data;
+      } catch (error) {
+        logScrapeFailure(logger, {
+          action: "fetchLiveStreamData",
+          liveId,
+          url,
+          error
+        });
+
+        if (cached) {
+          return cached.data;
+        }
+
+        throw error;
+      }
     })();
 
     inFlightLiveFetches.set(liveId, request);
@@ -153,6 +189,29 @@ function getLiveStreamUrl(liveData) {
       liveData.cdnRTMPPath ||
       ""
   );
+}
+
+function setCacheEntry(cache, key, value, maxEntries) {
+  cache.set(key, value);
+
+  while (cache.size > maxEntries) {
+    cache.delete(cache.keys().next().value);
+  }
+}
+
+function logScrapeFailure(logger, details) {
+  logger.warn?.("FPP TV scrape failed", {
+    ...details,
+    error: serializeError(details.error)
+  });
+}
+
+function serializeError(error) {
+  return {
+    name: error?.name || "Error",
+    message: error?.message || String(error),
+    cause: error?.cause?.message || undefined
+  };
 }
 
 export const fppScraper = createFppScraper();

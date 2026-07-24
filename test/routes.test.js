@@ -47,7 +47,7 @@ test("routes meta, stream, and poster requests", async () => {
   assert.equal(poster.headers["cache-control"], "public, max-age=60");
 });
 
-test("serves static root and rejects missing or traversal paths", async () => {
+test("serves static root and rejects missing, traversal, directory, and unsupported extension paths", async () => {
   const root = await dispatch("/");
   const missing = await dispatch("/missing.svg");
 
@@ -55,6 +55,9 @@ test("serves static root and rejects missing or traversal paths", async () => {
   assert.equal(root.headers["content-type"], "text/html; charset=utf-8");
   assert.equal(missing.statusCode, 404);
   assert.equal(resolvePublicPath("/%2e%2e/package.json"), null);
+  assert.equal(resolvePublicPath("/"), resolvePublicPath("/index.html"));
+  assert.equal(resolvePublicPath("/."), null);
+  assert.equal(resolvePublicPath("/index.txt"), null);
 });
 
 test("handles OPTIONS and rejects unsupported methods", async () => {
@@ -66,13 +69,22 @@ test("handles OPTIONS and rejects unsupported methods", async () => {
   assert.equal(post.headers.allow, "GET, OPTIONS");
 });
 
-async function dispatch(path, { method = "GET", addon } = {}) {
+test("parses request paths with a fixed base URL", async () => {
+  const response = await dispatch("/manifest.json", {
+    headers: { host: "not a valid host" }
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(JSON.parse(response.body).id, "com.skmobi.fpptv");
+});
+
+async function dispatch(path, { method = "GET", addon, headers = { host: "localhost:7000" } } = {}) {
   const response = new MockResponse();
   await handleRequest(
     {
       method,
       url: path,
-      headers: { host: "localhost:7000" }
+      headers
     },
     response,
     addon ? { addon } : undefined
