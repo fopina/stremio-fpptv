@@ -6,6 +6,11 @@ import { handleRequest } from "./http/routes.js";
 const server = createServer((request, response) => {
   handleRequest(request, response).catch((error) => {
     console.error(error);
+    if (response.headersSent || response.writableEnded) {
+      response.destroy();
+      return;
+    }
+
     response.writeHead(500, { "content-type": "application/json; charset=utf-8" });
     response.end(JSON.stringify({ error: "Internal server error" }));
   });

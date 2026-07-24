@@ -1,4 +1,4 @@
-export const BASE_URL = process.env.ADDON_BASE_URL || "http://localhost:7000";
+export const BASE_URL = parseBaseUrl(process.env.ADDON_BASE_URL, "http://localhost:7000");
 export const ADDON_PORT = parsePort(process.env.PORT, 7000);
 export const FPP_TV_URL = "https://tv.fpp.pt/";
 export const ENETRES_PLAYER_URL = "https://players.cdn.enetres.net/";
@@ -23,4 +23,21 @@ function parsePort(value, fallback) {
   }
 
   return port;
+}
+
+function parseBaseUrl(value, fallback) {
+  const baseUrl = value || fallback;
+
+  let url;
+  try {
+    url = new URL(baseUrl);
+  } catch {
+    throw new Error(`Invalid ADDON_BASE_URL value: ${baseUrl}`);
+  }
+
+  if (!["http:", "https:"].includes(url.protocol)) {
+    throw new Error(`Invalid ADDON_BASE_URL protocol: ${url.protocol}`);
+  }
+
+  return url.toString().replace(/\/$/, "");
 }

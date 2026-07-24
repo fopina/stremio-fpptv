@@ -12,7 +12,7 @@ export function createAddon({ scraper = fppScraper, baseUrl = BASE_URL } = {}) {
     }
 
     const source = SOURCE_BY_GENRE.get(extra.genre) || SOURCE_BY_KEY.get("recent");
-    const events = await scraper.scrapeSourceEvents(source).catch(() => []);
+    const events = await scraper.scrapeSourceEvents(source);
 
     return {
       metas: events.map((event) => eventToMeta(event, baseUrl)),

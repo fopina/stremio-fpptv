@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -22,6 +22,12 @@ export async function sendPublicFile(response, pathname) {
   const contentType = contentTypes[extname(filePath)] || "text/plain; charset=utf-8";
 
   try {
+    const fileStat = await stat(filePath);
+    if (!fileStat.isFile()) {
+      sendError(response, 404, "Not found");
+      return;
+    }
+
     const body = await readFile(filePath, "utf8");
     sendResponse(response, 200, body, { contentType });
   } catch {
@@ -39,7 +45,11 @@ export function resolvePublicPath(pathname, publicRoot = publicDir) {
   const filePath = resolve(root, fileName);
   const rootPrefix = root.endsWith(sep) ? root : `${root}${sep}`;
 
-  return filePath.startsWith(rootPrefix) ? filePath : null;
+  if (!filePath.startsWith(rootPrefix) || !contentTypes[extname(filePath)]) {
+    return null;
+  }
+
+  return filePath;
 }
 
 function decodePathname(pathname) {

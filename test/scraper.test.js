@@ -56,6 +56,55 @@ test("uses cached source events until the TTL expires", async () => {
   assert.equal(fetchCalls, 2);
 });
 
+test("serves stale source events and logs when refresh fails", async () => {
+  const html = await readFile(new URL("./fixtures/vod-griditem.html", import.meta.url), "utf8");
+  const warnings = [];
+  let currentTime = 1000;
+  let failFetch = false;
+  const scraper = createFppScraper({
+    ttlMs: 100,
+    now: () => currentTime,
+    logger: { warn: (...args) => warnings.push(args) },
+    fetchHtmlImpl: async () => {
+      if (failFetch) {
+        throw new Error("upstream unavailable");
+      }
+      return html;
+    }
+  });
+
+  const freshEvents = await scraper.scrapeSourceEvents(SOURCE_BY_KEY.get("recent"));
+  currentTime += 101;
+  failFetch = true;
+  const staleEvents = await scraper.scrapeSourceEvents(SOURCE_BY_KEY.get("recent"));
+
+  assert.equal(staleEvents, freshEvents);
+  assert.equal(warnings.length, 1);
+  assert.equal(warnings[0][0], "FPP TV scrape failed");
+  assert.equal(warnings[0][1].sourceKey, "recent");
+  assert.equal(warnings[0][1].error.message, "upstream unavailable");
+});
+
+test("logs and rejects source scrape failures without stale cache", async () => {
+  const warnings = [];
+  const scraper = createFppScraper({
+    logger: { warn: (...args) => warnings.push(args) },
+    fetchHtmlImpl: async () => {
+      throw new TypeError("parser boundary failed");
+    }
+  });
+
+  await assert.rejects(
+    () => scraper.scrapeSourceEvents(SOURCE_BY_KEY.get("recent")),
+    /parser boundary failed/
+  );
+
+  assert.equal(warnings.length, 1);
+  assert.equal(warnings[0][1].action, "scrapeSourceEvents");
+  assert.equal(warnings[0][1].url, "https://tv.fpp.pt/");
+  assert.equal(warnings[0][1].error.name, "TypeError");
+});
+
 test("resolves cached events by id without a live network call", async () => {
   const html = await readFile(new URL("./fixtures/vod-griditem.html", import.meta.url), "utf8");
   let fetchCalls = 0;
@@ -71,6 +120,17 @@ test("resolves cached events by id without a live network call", async () => {
 
   assert.equal(fetchCalls, 1);
   assert.equal(event.title, "Benfica & Porto <Final>");
+});
+
+test("findEventById does not swallow source scrape failures", async () => {
+  const scraper = createFppScraper({
+    logger: { warn: () => {} },
+    fetchHtmlImpl: async () => {
+      throw new Error("source failed");
+    }
+  });
+
+  await assert.rejects(() => scraper.findEventById("fpptv:event:recent:e-1234"), /source failed/);
 });
 
 test("deduplicates in-flight live stream lookups and allowlists returned URLs", async () => {
