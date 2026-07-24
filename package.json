@@ -6,6 +6,7 @@
   "description": "Stremio catalog and stream addon for tv.fpp.pt",
   "scripts": {
     "dev": "node --watch src/server.js",
+    "test": "node --test",
     "start": "node src/server.js"
   },
   "engines": {
